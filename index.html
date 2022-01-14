@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Bahaya Banjir Kabupaten Bantul</title>
+    <link rel="stylesheet" href="library/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="library/leaflet/leaflet.js"></script>
+    <script src="library/leaflet-providers-master/leaflet-providers.js"></script>
+    <script src="library/jquery.min.js"></script>
+</head>
+
+<body>
+    <div id="map">
+        <script>
+            var map = L.map('map').setView([-7.876922, 110.381026], 12.5);
+
+            var baseLayers = {
+                'Esri WorldTopoMap': L.tileLayer.provider('Esri.WorldTopoMap'),
+                'Esri WorldImagery': L.tileLayer.provider('Esri.WorldImagery').addTo(map),
+                'OSM Default': L.tileLayer.provider('OpenStreetMap.DE'),
+                'OSM France': L.tileLayer.provider('OpenStreetMap.France')
+            };
+
+
+            /* Memanggil Layer Bahaya Banjir */
+            var AreaBahayaBanjir = L.geoJson(null, {
+                style: function(feature) {
+                    return {
+                        color: "black",
+                        fillColor: KlasBanjir[feature.properties.Klas_Rawan],
+                        weight: 0.3,
+                        opacity: 0,
+                        fillOpacity: 0.7
+                    };
+                },
+
+                /*Tampilan HTML Top UP*/
+
+                onEachFeature: function( feature, layer ){
+                    layer.bindPopup(
+                        "Klas Bahaya Banjir : " + "<left>" + feature.properties.Klas_Rawan + "</left>" + "<br>" +
+                        "Luas :" + "<left>" + feature.properties.Shape_Area + "</left>" + " m2"
+                        )
+                }
+            });
+            $.getJSON("data/Bahayabanjirdirect.json", function(data) {
+                AreaBahayaBanjir.addData(data);
+            });
+
+			/* Merubah Tampilan Warna Berdasar Atribut Kelas Bahaya Banjir */
+			var KlasBanjir = {
+				"Aman":"#0b4a04",
+				"Cukup Aman":"#60bd1e",
+				"Agak Rawan":"#f6ff00",
+                "Rawan":"#eb7b26",
+                "Sangat Rawan":"#ff0000",
+			};
+
+            var mapLayers = {
+                'Area Bahaya Banjir': AreaBahayaBanjir
+            };
+
+            L.control.layers(baseLayers, mapLayers).addTo(map);
+        </script>
+    </div>
+</body>
+
+</html>
